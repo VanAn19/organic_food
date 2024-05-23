@@ -12,15 +12,12 @@ const productController = {
     },
     searchProduct: async (req,res)=> {
         try {
-            let data = await Product.find({
-                "$or": [
-                    {name: {$regex: req.params.value}}
-                ]
-            }).exec();
+            let data = await Product.find({ name: { $regex: ".*" + req.params.value + ".*" }});
             console.log(data);
-            res.status(200).json(data);
+            return res.status(200).json(data);
         } catch(err) {
-            res.status(500).json();
+            console.log(err);
+            return res.status(500).json(err);
         }
     }
 }

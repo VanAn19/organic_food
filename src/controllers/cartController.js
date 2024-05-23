@@ -14,21 +14,16 @@ const cartController = {
             }
             const existingCart = await Cart.findOne({
                 products: req.body.products,
-                user: req.body.user,
+                user: req.user.id,
             });
             if (existingCart && existingCart.status == "00") {
                 existingCart.quantity += req.body.quantity;
                 await existingCart.save();
             } else {
                 const cart = new Cart(req.body);
+                cart.user = req.user.id;
                 await cart.save();
-                // const savedCart = await cart.save();
-                // if (req.body.status === "00") {
-                //     const oldCart = Cart.find({ status: "00" });
-                //     await oldCart.updateOne({ $push: { products: savedCart._id } });
-                // }
             }
-            // await Product.findByIdAndUpdate(req.body.products, { $inc: { quantity: -req.body.quantity } });
             return res.status(200).json("Add product to cart successfully");
         } catch(err) {
             console.log(err);
@@ -37,23 +32,11 @@ const cartController = {
     },
     showCart: async (req, res) => {
         try {
-            const token = req.headers.token;
-            if (token) {
-                try {
-                    const accessToken = token.split(" ")[1];
-                    const decoded = jwt.verify(accessToken, process.env.JWT_ACCESS_KEY);
-                    const userCart = await Cart.find({ user: decoded.id, status: "00" }).populate('products');
-                    // if (userCart && userCart.products === 0) {
-                    //     await Cart.findOneAndDelete({ user: decoded.id });
-                    // }
-                    res.status(200).json(userCart);
-                } catch(err) {
-                    console.log(err);
-                    res.status(403).json("Token is not valid");
-                }
-            } else {
-                res.status(401).json("You're not authenticated");
-            }
+            const userCart = await Cart.find({ user: req.user.id, status: "00" }).populate('products');
+            if (userCart && userCart.products === 0) {
+                await Cart.findOneAndDelete({ user: req.user.id });
+            } 
+            return res.status(200).json(userCart)
         } catch(err) {
             console.log(err);
             res.status(500).json(err);
@@ -61,19 +44,8 @@ const cartController = {
     },
     deleteCart: async (req, res) => {
         try {
-            const token = req.headers.token;
-            if (token) {
-                try {
-                    const accessToken = token.split(" ")[1];
-                    const decoded = jwt.verify(accessToken, process.env.JWT_ACCESS_KEY);
-                    await Cart.findOneAndDelete({ user: decoded.id }, { _id: req.params.id });
-                    res.status(200).json("Delete a cart successfully");
-                } catch(err) {
-                    res.status(401).json("Token is not valid");
-                }
-            } else {
-                res.status(401).json("You're not authenticated");
-            }
+            await Cart.findOneAndDelete({ user: req.user.id }, { _id: req.body.cartId });
+            return res.status(200).json("Delete a cart successfully");
         } catch(err) {
             res.status(500).json(err);
         }

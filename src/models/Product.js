@@ -16,10 +16,12 @@ const productSchema = new mongoose.Schema({
         type: Number,
         require: true,
     },
-    type: {
-        type: String,
-        require: true,
-    },
+    category:{
+        // type: String,
+        // require: true,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category"
+    },  
     desc: {
         type: String,
         require: true,
