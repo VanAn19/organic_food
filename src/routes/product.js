@@ -3,7 +3,8 @@ const productController = require('../controllers/productController');
 
 const router = require('express').Router();
 
+router.get('/get-image', productController.getImage);
 router.get('/:slug', middlewareController.verifyToken, productController.showProduct);
-router.get('/search/:value', middlewareController.verifyToken, productController.searchProduct)
+router.get('/search/:value', middlewareController.verifyToken, productController.searchProduct);
 
 module.exports = router;

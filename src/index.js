@@ -7,6 +7,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 var bodyParser = require("body-parser");
 const methodOverride = require('method-override');
+const path = require('path');
 
 const homeRouter = require('./routes/home');
 const productRouter = require('./routes/product');
@@ -26,12 +27,13 @@ db.connect();
 app.use(bodyParser.json({limit:"50mb"}));
 app.use(methodOverride('_method'));
 app.use(cors());
-app.use(helmet());
+app.use(helmet({
+    crossOriginResourcePolicy: false,
+}));
 app.use(cookieParser());
 // app.use(express.json());
 app.use(morgan('common'));
-
-app.use('/uploads', express.static('uploads'))
+app.use('/src/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ROUTES
 app.use('/v1/user', userRouter);
