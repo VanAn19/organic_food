@@ -1,9 +1,9 @@
 const homeController = require('../controllers/homeController');
-const middlewareController = require('../controllers/middlewareController');
+const jwtVerify = require('../middleware/jwtVerify');
 
 const router = require('express').Router();
 
-router.get('/', middlewareController.verifyToken, homeController.showHome);
-router.get('/:slug', middlewareController.verifyToken, homeController.showProductByCategory);
+router.get('/', jwtVerify.verifyToken, homeController.showHome);
+router.get('/:slug', jwtVerify.verifyToken, homeController.showProductByCategory);
 
 module.exports = router;

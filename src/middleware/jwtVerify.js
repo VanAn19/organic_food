@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const client = require('../config/redis');
 
 const middlewareController = {
     // VERIFY TOKEN
@@ -16,6 +17,21 @@ const middlewareController = {
         } else {
             return res.status(401).json("You're not authenticated");
         }
+    },
+    verifyRefreshToken: async (refreshToken) => {
+        return new Promise((resolve, reject) => {
+            jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY, (err, payload) => {
+                if (err) {
+                    return reject(err);
+                }
+                client.get(payload.id.toString(), (err, reply) => {
+                    if (err) reject(err);
+                    if (refreshToken === reply) {
+                        return resolve(payload);
+                    }
+                })
+            })
+        })
     },
     verifyTokenAndAuth: (req,res,next) => {
         middlewareController.verifyToken(req, res, () => {

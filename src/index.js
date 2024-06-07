@@ -14,7 +14,7 @@ const productRouter = require('./routes/product');
 const cartRouter = require('./routes/cart');
 const orderRouter = require('./routes/order');
 const adminRouter = require('./routes/admin');
-const userRouter = require('./routes/user');
+const authRouter = require('./routes/auth');
 
 const app = express();
 
@@ -23,6 +23,8 @@ dotenv.config();
 // CONNECT DB
 const db = require('./config/db');
 db.connect();
+
+const client = require('./config/redis');
 
 app.use(bodyParser.json({limit:"50mb"}));
 app.use(methodOverride('_method'));
@@ -36,7 +38,7 @@ app.use(morgan('common'));
 app.use('/src/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ROUTES
-app.use('/v1/user', userRouter);
+app.use('/v1/user', authRouter);
 app.use('/v1/home', homeRouter);
 app.use('/v1/admin', adminRouter);
 app.use('/v1/cart', cartRouter);
